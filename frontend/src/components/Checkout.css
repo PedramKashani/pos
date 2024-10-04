@@ -1,0 +1,47 @@
+/* frontend/src/components/Checkout.css */
+.checkout-container {
+  max-width: 600px;
+  margin: 0 auto;
+  padding: 20px;
+  border: 1px solid #ccc;
+  background-color: #f9f9f9;
+}
+
+.checkout-container form {
+  display: flex;
+  flex-direction: column;
+}
+
+.checkout-container form div {
+  margin-bottom: 15px;
+}
+
+.checkout-container label {
+  font-weight: bold;
+}
+
+.checkout-container input {
+  padding: 8px;
+  font-size: 16px;
+}
+
+.checkout-container button {
+  padding: 10px;
+  font-size: 16px;
+  background-color: #28a745;
+  color: white;
+  border: none;
+  cursor: pointer;
+}
+
+.checkout-container button:hover {
+  background-color: #218838;
+}
+
+.error {
+  color: red;
+}
+
+.success {
+  color: green;
+}

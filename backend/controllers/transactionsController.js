@@ -1,7 +1,9 @@
 const pool = require("../config/db");
 
 exports.processCheckout = async (req, res) => {
+  console.log("Received checkout data:", req.body); 
   const { items } = req.body;
+  
   // validate input
   if (
     !items ||

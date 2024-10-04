@@ -8,12 +8,25 @@ const JWT_SECRET = process.env.JWT_SECRET;
 
 // User Registration
 exports.registerUser = async (req, res) => {
+
+   console.log("Received registration data:", req.body);
   const { username, password, full_name, role } = req.body;
 
   // Input validation
-  if (!username || !password || !full_name || !role) {
-    return res.status(400).json({ error: "All fields are required." });
+
+  if (
+    !username.trim() ||
+    !password.trim() ||
+    !full_name.trim() ||
+    !role.trim()
+  ) {
+    return res
+      .status(400)
+      .json({
+        error: "All fields (username, password, full name, role) are required.",
+      });
   }
+
 
   try {
     // Check if the username already exists
@@ -26,7 +39,7 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ error: "Username already exists." });
     }
 
-    // Hash the password using bcrypt
+    
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the new user into the database
@@ -76,7 +89,7 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password." });
     }
 
-    // Generate a JWT token for the authenticated user
+    
     const token = jwt.sign(
       { user_id: user.user_id, username: user.username, role: user.role },
       JWT_SECRET,
