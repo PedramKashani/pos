@@ -1,0 +1,166 @@
+/* OrdersList.css */
+.orders-list-container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 2rem;
+}
+
+.orders-list-container h2 {
+  color: white;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.orders-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+  gap: 1.5rem;
+}
+
+.order-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+  cursor: pointer;
+  border: 2px solid transparent;
+}
+
+.order-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.15);
+  border-color: #667eea;
+}
+
+.order-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 1rem;
+  padding-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.order-id {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.order-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.order-number {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+}
+
+.order-date {
+  font-size: 0.9rem;
+  color: #999;
+}
+
+.order-info {
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+}
+
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.info-label {
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
+}
+
+.info-value {
+  font-size: 1rem;
+  color: #333;
+  font-weight: 600;
+}
+
+.info-value.total {
+  font-size: 1.25rem;
+  color: #667eea;
+  font-weight: 700;
+}
+
+.order-details {
+  margin-top: 1.5rem;
+  padding-top: 1.5rem;
+  border-top: 2px solid #f0f0f0;
+}
+
+.order-details h4 {
+  color: #667eea;
+  margin-bottom: 1rem;
+  font-size: 1.2rem;
+}
+
+.items-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+}
+
+.items-table thead {
+  background: #f8f9fa;
+}
+
+.items-table th {
+  padding: 0.75rem;
+  text-align: left;
+  font-weight: 600;
+  color: #333;
+  border-bottom: 2px solid #e0e0e0;
+}
+
+.items-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.items-table tbody tr:hover {
+  background: #f8f9fa;
+}
+
+.product-cell {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.product-desc {
+  font-size: 0.85rem;
+  color: #666;
+  font-style: italic;
+}
+
+@media (max-width: 768px) {
+  .orders-list-container {
+    padding: 1rem;
+  }
+
+  .orders-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .order-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+

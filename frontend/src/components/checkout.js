@@ -1,6 +1,8 @@
 // frontend/src/components/Checkout.js
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Checkout.css";
+import { API } from "../config/api";
 
 const Checkout = ({ cart, onClearCart }) => {
   const [paymentDetails, setPaymentDetails] = useState({
@@ -11,6 +13,12 @@ const Checkout = ({ cart, onClearCart }) => {
   });
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [checkoutCompleted, setCheckoutCompleted] = useState(false);
+  const [transactionData, setTransactionData] = useState(null);
+  const redirectTimerRef = useRef(null);
+  const checkoutCompletedRef = useRef(false);
+  const navigate = useNavigate();
 
   // Handle input change for payment details
   const handleChange = (e) => {
@@ -20,12 +28,22 @@ const Checkout = ({ cart, onClearCart }) => {
     });
   };
 
-  // Mock payment processing
-  const handleCheckout = (e) => {
+  // Process checkout with backend API
+  const handleCheckout = async (e) => {
     e.preventDefault();
-    setError(""); // Clear any existing errors
+    setError("");
+    setSuccess("");
 
-    // Basic validation for payment fields (you can expand this as needed)
+    // Validate cart is not empty FIRST (before payment validation)
+    if (!cart || cart.length === 0) {
+      setError("Your cart is empty. Please add items to your cart first.");
+      setTimeout(() => {
+        navigate("/orders");
+      }, 2000);
+      return;
+    }
+
+    // Basic validation for payment fields
     if (
       !paymentDetails.cardNumber ||
       !paymentDetails.cardHolder ||
@@ -36,32 +54,159 @@ const Checkout = ({ cart, onClearCart }) => {
       return;
     }
 
-    // Mocking payment processing
-    setTimeout(() => {
-      setSuccess("Payment processed successfully!");
-      onClearCart(); // Clear the cart after a successful checkout
-    }, 1000);
+    // Get selected customer from localStorage (set in UserOrderPage)
+    const selectedCustomerId = localStorage.getItem("selected_customer_id");
+
+    // Prepare items for checkout
+    const items = cart.map((item) => ({
+      product_id: item.product_id,
+      quantity: item.quantity,
+      price: parseFloat(item.price),
+    }));
+
+    setLoading(true);
+
+    try {
+      const result = await API.checkout({
+        items,
+        customer_id: selectedCustomerId ? parseInt(selectedCustomerId) : null,
+      });
+
+      // Calculate total for success message BEFORE clearing cart
+      const total = cart.reduce((sum, item) => {
+        const price = parseFloat(item.price);
+        return sum + (isNaN(price) ? 0 : price) * item.quantity;
+      }, 0);
+
+      // Store transaction data
+      const txData = {
+        transaction_id: result.transaction_id,
+        total: total.toFixed(2),
+      };
+
+      // Set ref immediately to prevent any redirects
+      checkoutCompletedRef.current = true;
+
+      // Set state to show success message
+      setCheckoutCompleted(true);
+      setTransactionData(txData);
+      const successMessage = `✅ Payment Processed Successfully!\n\nTransaction ID: ${
+        result.transaction_id
+      }\nTotal Amount: $${total.toFixed(2)}\n\nThank you for your purchase!`;
+      setSuccess(successMessage);
+
+      // Clear cart and selected customer, then redirect AFTER showing message
+      redirectTimerRef.current = setTimeout(() => {
+        onClearCart();
+        localStorage.removeItem("selected_customer_id");
+        navigate("/orders"); // Redirect to orders list to see the new order
+      }, 5000); // 5 seconds to read the message
+    } catch (error) {
+      setError(
+        error.message || "Failed to process checkout. Please try again."
+      );
+    } finally {
+      setLoading(false);
+    }
   };
+
+  // Cleanup redirect timer on unmount
+  useEffect(() => {
+    return () => {
+      if (redirectTimerRef.current) {
+        clearTimeout(redirectTimerRef.current);
+      }
+    };
+  }, []);
+
+  // If cart is empty on mount (and checkout hasn't completed), redirect back to orders page
+  useEffect(() => {
+    // Only check on initial mount
+    // CRITICAL: Don't redirect if checkout was just completed successfully
+    if (
+      (!cart || cart.length === 0) &&
+      !checkoutCompletedRef.current &&
+      !checkoutCompleted &&
+      !success &&
+      !loading
+    ) {
+      const timer = setTimeout(() => {
+        navigate("/orders");
+      }, 2000);
+      return () => clearTimeout(timer);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []); // Empty dependency array - only run on mount
 
   return (
     <div className="checkout-container">
       <h2>Checkout</h2>
-      {cart.length === 0 ? (
-        <p>Your cart is empty.</p>
+      {checkoutCompletedRef.current || checkoutCompleted || success ? (
+        // Show success message after checkout completes (even if cart is now empty)
+        <div className="checkout-success">
+          <div className="success-message">
+            {success ? (
+              success.split("\n").map((line, index) => (
+                <p
+                  key={index}
+                  className={index === 0 ? "success-title" : "success-detail"}
+                >
+                  {line}
+                </p>
+              ))
+            ) : transactionData ? (
+              <>
+                <p className="success-title">
+                  ✅ Payment Processed Successfully!
+                </p>
+                <p className="success-detail">
+                  Transaction ID: {transactionData.transaction_id}
+                </p>
+                <p className="success-detail">
+                  Total Amount: ${transactionData.total}
+                </p>
+                <p className="success-detail">Thank you for your purchase!</p>
+              </>
+            ) : (
+              <p className="success-title">
+                ✅ Payment Processed Successfully!
+              </p>
+            )}
+          </div>
+          <p className="redirect-message">
+            Redirecting to orders page in a few seconds...
+          </p>
+        </div>
+      ) : !cart || cart.length === 0 ? (
+        <div>
+          <p className="error">
+            Your cart is empty. Redirecting to orders page...
+          </p>
+        </div>
       ) : (
         <div>
           <ul>
-            {cart.map((item) => (
-              <li key={item.id}>
-                {item.name} - {item.quantity} x ${item.price.toFixed(2)} = $
-                {(item.price * item.quantity).toFixed(2)}
-              </li>
-            ))}
+            {cart.map((item) => {
+              // Ensure item.price is a number
+              const price = parseFloat(item.price);
+              const validPrice = !isNaN(price) ? price : 0;
+
+              return (
+                <li key={item.product_id}>
+                  {item.name} - {item.quantity} x ${validPrice.toFixed(2)} = $
+                  {(validPrice * item.quantity).toFixed(2)}
+                </li>
+              );
+            })}
           </ul>
           <p>
             Total: $
             {cart
-              .reduce((total, item) => total + item.price * item.quantity, 0)
+              .reduce((total, item) => {
+                const price = parseFloat(item.price);
+                const validPrice = !isNaN(price) ? price : 0;
+                return total + validPrice * item.quantity;
+              }, 0)
               .toFixed(2)}
           </p>
 
@@ -114,7 +259,9 @@ const Checkout = ({ cart, onClearCart }) => {
             </div>
             {error && <p className="error">{error}</p>}
             {success && <p className="success">{success}</p>}
-            <button type="submit">Process Payment</button>
+            <button type="submit" disabled={loading}>
+              {loading ? "Processing..." : "Process Payment"}
+            </button>
           </form>
         </div>
       )}

@@ -6,10 +6,25 @@ const jwt = require("jsonwebtoken");
 
 const JWT_SECRET = process.env.JWT_SECRET;
 
+if (!JWT_SECRET) {
+  console.error("JWT_SECRET is not set in environment variables");
+  process.exit(1);
+}
+
+// Get all users
+exports.getAllUsers = async (req, res) => {
+  try {
+    const result = await pool.query(
+      "SELECT user_id, username, full_name, role FROM myschema.users"
+    );
+    res.status(200).json(result.rows);
+  } catch (error) {
+    res.status(500).json({ error: "Failed to fetch users." });
+  }
+};
+
 // User Registration
 exports.registerUser = async (req, res) => {
-
-   console.log("Received registration data:", req.body);
   const { username, password, full_name, role } = req.body;
 
   // Input validation
@@ -20,13 +35,10 @@ exports.registerUser = async (req, res) => {
     !full_name.trim() ||
     !role.trim()
   ) {
-    return res
-      .status(400)
-      .json({
-        error: "All fields (username, password, full name, role) are required.",
-      });
+    return res.status(400).json({
+      error: "All fields (username, password, full name, role) are required.",
+    });
   }
-
 
   try {
     // Check if the username already exists
@@ -39,7 +51,6 @@ exports.registerUser = async (req, res) => {
       return res.status(400).json({ error: "Username already exists." });
     }
 
-    
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Insert the new user into the database
@@ -53,8 +64,9 @@ exports.registerUser = async (req, res) => {
       .status(201)
       .json({ message: "User registered successfully", user: result.rows[0] });
   } catch (error) {
-    console.error("Error registering user:", error);
-    res.status(500).json({ error: error.message });
+    res
+      .status(500)
+      .json({ error: "Failed to register user. Please try again." });
   }
 };
 
@@ -89,7 +101,6 @@ exports.loginUser = async (req, res) => {
       return res.status(400).json({ error: "Invalid username or password." });
     }
 
-    
     const token = jwt.sign(
       { user_id: user.user_id, username: user.username, role: user.role },
       JWT_SECRET,
@@ -98,7 +109,6 @@ exports.loginUser = async (req, res) => {
 
     res.status(200).json({ message: "Login successful", token });
   } catch (error) {
-    console.error("Error logging in user:", error);
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ error: "Failed to login. Please try again." });
   }
 };

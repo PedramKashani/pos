@@ -1,65 +1,72 @@
 // /frontend/src/components/App.js
 import React, { useState, useEffect } from "react";
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from "react-router-dom";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 import Login from "./Login";
 import Register from "./Register";
-import CartList from "./CartList";
-import Checkout from "./checkout";
+import Checkout from "./Checkout";
 import LandingPage from "./LandingPage";
-
-
-
-
-
+import UserOrderPage from "./UserOrderPage";
+import OrdersList from "./OrdersList";
+import CustomerPage from "./CustomerPage";
+import Navigation from "./Navigation";
+import { API } from "../config/api";
+import "../index.css";
 
 function App() {
-  // Define cart state and related functions in App.js
-  const [cart, setCart] = useState([]);
+  // Load cart from localStorage on mount
+  const [cart, setCart] = useState(() => {
+    try {
+      const savedCart = localStorage.getItem("pos_cart");
+      return savedCart ? JSON.parse(savedCart) : [];
+    } catch (error) {
+      return [];
+    }
+  });
   const [products, setProducts] = useState([]); // State for fetched products
+
+  // Save cart to localStorage whenever it changes
+  useEffect(() => {
+    localStorage.setItem("pos_cart", JSON.stringify(cart));
+  }, [cart]);
 
   // Function to clear the cart (useful for checkout)
   const clearCart = () => {
     setCart([]);
+    localStorage.removeItem("pos_cart");
   };
 
   // Fetch products from backend
   useEffect(() => {
     const fetchProducts = async () => {
       try {
-        const response = await fetch("http://localhost:3000/products");
-        const data = await response.json();
+        const data = await API.getProducts();
         setProducts(data);
       } catch (error) {
-        console.error("Error fetching products:", error);
+        // Error handling - products can be fetched without auth
       }
     };
 
     fetchProducts();
   }, []); // Empty dependency array to run once on component mount
 
- 
   return (
     <Router>
       <div className="App">
-        <h1>Welcome to the POS System</h1>
+        <Navigation />
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
           <Route
-            path="/products"
-            element={
-              <CartList products={products} cart={cart} setCart={setCart} />
-            }
-          />
-          <Route
             path="/checkout"
             element={<Checkout cart={cart} onClearCart={clearCart} />}
           />
+          <Route
+            path="/new-order"
+            element={<UserOrderPage cart={cart} setCart={setCart} />}
+          />
+          <Route path="/orders" element={<OrdersList />} />
+          <Route path="/customers" element={<CustomerPage />} />
         </Routes>
       </div>
     </Router>

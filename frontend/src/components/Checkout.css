@@ -1,47 +1,125 @@
 /* frontend/src/components/Checkout.css */
 .checkout-container {
-  max-width: 600px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  background-color: #f9f9f9;
+  max-width: 700px;
+  margin: 2rem auto;
+  padding: 0;
+}
+
+.checkout-container h2 {
+  color: #667eea;
+  font-size: 2rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.checkout-container > div {
+  background: white;
+  border-radius: 16px;
+  padding: 2.5rem;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+}
+
+.checkout-container ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 2rem 0;
+  background: #f8f9fa;
+  border-radius: 12px;
+  padding: 1.5rem;
+}
+
+.checkout-container ul li {
+  padding: 1rem;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  font-size: 1.1rem;
+}
+
+.checkout-container ul li:last-child {
+  border-bottom: none;
+}
+
+.checkout-container > div > p:first-of-type {
+  text-align: right;
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #667eea;
+  margin: 1.5rem 0;
+  padding: 1rem;
+  background: linear-gradient(135deg, #f0f0ff 0%, #e8e8ff 100%);
+  border-radius: 12px;
 }
 
 .checkout-container form {
   display: flex;
   flex-direction: column;
+  gap: 1.5rem;
+  margin-top: 2rem;
 }
 
-.checkout-container form div {
-  margin-bottom: 15px;
+.checkout-container form h3 {
+  color: #667eea;
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  border-bottom: 2px solid #f0f0f0;
+  padding-bottom: 0.5rem;
 }
 
-.checkout-container label {
-  font-weight: bold;
-}
-
-.checkout-container input {
-  padding: 8px;
-  font-size: 16px;
+.checkout-container form > div {
+  display: flex;
+  flex-direction: column;
 }
 
 .checkout-container button {
-  padding: 10px;
-  font-size: 16px;
-  background-color: #28a745;
+  margin-top: 1rem;
+  width: 100%;
+  padding: 1rem;
+  font-size: 1.1rem;
+  background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
   color: white;
-  border: none;
-  cursor: pointer;
 }
 
-.checkout-container button:hover {
-  background-color: #218838;
+.checkout-success {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: linear-gradient(135deg, #d4edda 0%, #c3e6cb 100%);
+  border: 3px solid #28a745;
+  border-radius: 16px;
+  margin: 2rem 0;
+  box-shadow: 0 8px 16px rgba(40, 167, 69, 0.2);
 }
 
-.error {
-  color: red;
+.success-message {
+  margin-bottom: 2rem;
 }
 
-.success {
-  color: green;
+.success-title {
+  color: #155724;
+  font-size: 2rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+}
+
+.success-detail {
+  color: #155724;
+  font-size: 1.2rem;
+  margin: 1rem 0;
+  line-height: 1.8;
+}
+
+.redirect-message {
+  color: #666;
+  font-style: italic;
+  margin-top: 2rem;
+  font-size: 1rem;
+}
+
+.checkout-container .error {
+  background: #f8d7da;
+  border: 2px solid #f5c6cb;
+  padding: 1rem;
+  border-radius: 8px;
+  margin: 1rem 0;
 }

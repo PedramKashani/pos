@@ -2,11 +2,11 @@
 CREATE SCHEMA IF NOT EXISTS myschema;
 
 -- Drop tables if they already exist
-DROP TABLE IF EXISTS myschema.transaction_items CASCADE;
-DROP TABLE IF EXISTS myschema.transactions CASCADE;
-DROP TABLE IF EXISTS myschema.inventory CASCADE;
-DROP TABLE IF EXISTS myschema.products CASCADE;
-DROP TABLE IF EXISTS myschema.users CASCADE;
+-- DROP TABLE IF EXISTS myschema.transaction_items CASCADE;
+-- DROP TABLE IF EXISTS myschema.transactions CASCADE;
+-- DROP TABLE IF EXISTS myschema.inventory CASCADE;
+-- DROP TABLE IF EXISTS myschema.products CASCADE;
+-- DROP TABLE IF EXISTS myschema.users CASCADE;
 
 -- Create the users table
 CREATE TABLE myschema.users (
@@ -36,12 +36,28 @@ CREATE TABLE myschema.inventory (
     last_updated TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
-
+-- Create the customers table (must be before transactions due to foreign key reference)
+CREATE TABLE myschema.customers (
+    customer_id SERIAL PRIMARY KEY,  
+    first_name VARCHAR(50) NOT NULL,  
+    last_name VARCHAR(50) NOT NULL,  
+    email VARCHAR(100) UNIQUE NOT NULL, 
+    phone_number VARCHAR(20),  
+    address_line_1 VARCHAR(100),  
+    address_line_2 VARCHAR(100),  
+    city VARCHAR(50),  
+    state VARCHAR(50),  
+    postal_code VARCHAR(20),  
+    country VARCHAR(50),  
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP, 
+    updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP  
+);
 
 -- Create the transactions table
 CREATE TABLE myschema.transactions (
     transaction_id SERIAL PRIMARY KEY,
     user_id INT REFERENCES myschema.users(user_id) ON DELETE SET NULL,
+    customer_id INT REFERENCES myschema.customers(customer_id) ON DELETE SET NULL,
     transaction_total NUMERIC(10, 2) NOT NULL CHECK (transaction_total >= 0),
     transaction_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );

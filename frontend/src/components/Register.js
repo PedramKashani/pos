@@ -1,6 +1,8 @@
 // frontend/src/components/Register.js
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import "./Register.css";
+import { API } from "../config/api";
 
 const Register = () => {
   const [formData, setFormData] = useState({
@@ -12,6 +14,7 @@ const Register = () => {
 
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const navigate = useNavigate();
 
   const handleChange = (e) => {
     setFormData({
@@ -22,29 +25,17 @@ const Register = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    // console.log("Form Data:", formData);
-    console.log("Form Data before submission:", formData);
+    setError("");
+    setSuccess("");
+
     try {
-      const response = await fetch("http://localhost:3000/users/register", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(formData),
-      });
-
-      const data = await response.json();
-
-      if (response.ok) {
-        setSuccess("Registration successful!");
-        setError("");
-      } else {
-        setError(data.error || "Registration failed");
-        setSuccess("");
-      }
+      await API.register(formData);
+      setSuccess("Registration successful!");
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
     } catch (err) {
-      console.error("Error registering:", err);
-      setError("An error occurred. Please try again later.");
+      setError(err.message || "An error occurred. Please try again later.");
     }
   };
 
@@ -102,7 +93,9 @@ const Register = () => {
         </div>
         {error && <p className="error">{error}</p>}
         {success && <p className="success">{success}</p>}
-        <button type="submit">Register</button>
+        <button type="submit" className="btn-primary">
+          Register
+        </button>
       </form>
     </div>
   );

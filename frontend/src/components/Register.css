@@ -1,18 +1,32 @@
 /* frontend/src/components/Register.css */
 .register-container {
-  max-width: 400px;
-  margin: 0 auto;
-  padding: 20px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
+  max-width: 500px;
+  margin: 2rem auto;
+  padding: 2.5rem;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
 }
 
-.error {
-  color: red;
+.register-container h2 {
+  text-align: center;
+  color: #667eea;
+  margin-bottom: 2rem;
+  font-size: 2rem;
 }
 
-.success {
-  color: green;
+.register-container form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
+.register-container form > div {
+  display: flex;
+  flex-direction: column;
+}
 
+.register-container button {
+  margin-top: 0.5rem;
+  width: 100%;
+}

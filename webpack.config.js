@@ -1,13 +1,22 @@
 const path = require("path");
+const webpack = require("webpack");
+require("dotenv").config();
 
 module.exports = {
   entry: "./frontend/src/index.js", // Frontend entry point
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "bundle.js", // Output file
-    publicPath: '/',
+    publicPath: "/",
   },
   mode: "development",
+  plugins: [
+    new webpack.DefinePlugin({
+      "process.env.REACT_APP_API_URL": JSON.stringify(
+        process.env.REACT_APP_API_URL || "http://localhost:3000"
+      ),
+    }),
+  ],
   module: {
     rules: [
       {
